@@ -1,18 +1,15 @@
-# azure-pipelines.yml
-
-trigger: none # No CI builds on direct pushes to any branch
-
+trigger: none
 pr:
   branches:
     include:
-      - main # Trigger ONLY on Pull Requests targeting the main branch
+      - main
 
 pool:
-  vmImage: 'ubuntu-latest' # Use a Linux agent
+  vmImage: 'ubuntu-latest'
 
 variables:
-  pythonVersion: '3.10' # Specify the Python version you want to use
-  sourceDirectory: 'app' # Your source code directory for coverage measurement
+  pythonVersion: '3.10'
+  sourceDirectory: 'app'
 
 steps:
 - task: UsePythonVersion@0
@@ -21,57 +18,46 @@ steps:
   displayName: 'Use Python $(pythonVersion)'
 
 - script: |
-    # Install the uv tool itself using pip (which comes with the Python installation)
     python -m pip install --upgrade pip uv
   displayName: 'Install uv'
 
 - script: |
-    # Install dependencies defined in pyproject.toml using uv sync.
-    # --all-extras installs all optional dependency groups.
-    # Ensure ruff, pytest, pytest-cov are defined in your pyproject.toml's
-    # optional-dependencies (e.g., under [project.optional-dependencies.dev]).
-    # If you use a specific group name like 'dev', use: uv sync --extra dev
-    echo "Installing dependencies from pyproject.toml using uv..."
     uv sync --all-extras
   displayName: 'Install dependencies using uv'
 
 - script: |
-    echo "Running Ruff linter..."
     ruff check .
   displayName: 'Run Ruff Linter'
-  failOnStderr: true # Fail if ruff check outputs errors
+  failOnStderr: true
 
 - script: |
-    echo "Checking Ruff formatting..."
     ruff format --check .
   displayName: 'Check Ruff Formatting'
-  failOnStderr: true # Fail if ruff format --check finds files needing formatting
+  failOnStderr: true
 
 - script: |
-    echo "Running Pytest with coverage for $(sourceDirectory)..."
-    # Run pytest, collect coverage for the specified source directory,
-    # report to terminal, generate XML reports for ADO, and fail if coverage < 80%
     pytest \
       --cov=$(sourceDirectory) \
       --cov-report=term \
       --cov-report=xml:coverage.xml \
       --junitxml=TEST-results.xml \
-      --cov-fail-under=80
+      --cov-fail-under=80 \
+      tests/
   displayName: 'Run Pytest with Coverage (Fail < 80%)'
-  failOnStderr: true # Fail the step if pytest exits with non-zero status (e.g., test failures or low coverage)
+  failOnStderr: true
 
 - task: PublishTestResults@2
-  condition: succeededOrFailed() # Run this even if the pytest step failed, to publish results
+  condition: succeededOrFailed()
   inputs:
     testResultsFormat: 'JUnit'
     testResultsFiles: '**/TEST-results.xml'
-    failTaskOnFailedTests: true # Mark the *pipeline* as failed if there are test failures in the results
+    searchFolder: '$(System.DefaultWorkingDirectory)'
+    failTaskOnFailedTests: true
   displayName: 'Publish Test Results'
 
 - task: PublishCodeCoverageResults@1
-  condition: succeededOrFailed() # Run this even if the pytest step failed, to publish coverage
+  condition: succeededOrFailed()
   inputs:
     codeCoverageTool: 'Cobertura'
     summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage.xml'
-    # reportDirectory: '$(System.DefaultWorkingDirectory)/htmlcov' # Optional: if you also generate HTML reports
   displayName: 'Publish Code Coverage Results'
