@@ -15,6 +15,7 @@ The primary goal of this project is to provide [briefly describe the main purpos
 - Unit and integration testing with Pytest.
 - Secure configuration management using Azure DevOps Variable Groups.
 - Structured development workflow with Git Branch Policies and Azure Boards.
+- Tags and semi linear merge strategy are used
 
 ## Architecture
 
