@@ -1,0 +1,190 @@
+# --- Python ---
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+*.pyd
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+# Usually specify the pyinstaller *.spec file in the repository and ignore the build output.
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+.ruff_cache/
+pytestdebug.log
+
+# Type checker cache
+.mypy_cache/
+.pytype/
+.dmypy.json
+dmypy.json
+
+# profiling data
+*.prof
+*.cprof
+
+
+# --- Virtual Environments ---
+# Standard names for virtual environments
+.env/
+env/
+venv/
+.venv/
+ENV/
+VENV/
+
+# Virtualenvwrapper directories
+.virtualenvs/
+
+# Conda environments
+.conda/
+conda-meta/
+
+# direnv
+.direnv/
+layout_python*
+
+
+# --- Flask Specific ---
+# Flask instance folder (should NOT be versioned - contains config secrets, DBs, etc.)
+instance/
+# Files often created in the instance folder (or project root during dev)
+*.sqlite
+*.sqlite3
+*.db
+# File system session files (less common now, but just in case)
+flask_session/
+
+
+# --- Secrets & Sensitive Configuration ---
+# Environment variables - DO commit *.example files, DON'T commit actual .env files
+.env
+.env.*
+# BUT: do NOT ignore .env.example or similar template files!
+# !.env.example
+# !.env.sample
+
+# Credentials files (adapt names as needed)
+credentials.*
+secrets.*
+*.key
+*.pem # Unless it's a public key intended for distribution
+
+# Local settings overrides (if applicable)
+config.local.py
+settings.local.py
+
+
+# --- IDEs / Editors ---
+# JetBrains IDEs (PyCharm, IntelliJ, etc.)
+.idea/
+
+# VS Code
+.vscode/*
+# BUT: Consider committing shared settings if your team agrees
+# !.vscode/settings.json
+# !.vscode/launch.json
+# !.vscode/extensions.json
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.sw[op]
+*~
+Session.vim
+.netrwhist
+
+# Emacs
+*#
+.#*
+
+# Other
+.project
+.pydevproject
+.settings/
+
+
+# --- Operating System Files ---
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+# Windows
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+
+# --- Web Development Assets (if generated) ---
+# Example: If using Node.js tools for frontend build steps
+# node_modules/
+# npm-debug.log*
+# yarn-error.log*
+# yarn-debug.log*
+# BUT: DO commit lock files!
+# !package-lock.json
+# !yarn.lock
+
+
+# --- Log Files ---
+*.log
+logs/
+
+
+# --- Other Tools ---
+# Tox automation project
+.tox/
+
+# Nox automation project
+.nox/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Terraform state (if managing infra alongside code)
+# .terraform/
+# *.tfstate
+# *.tfstate.backup
+
+# Serverless Framework files (if used)
+# .serverless/
