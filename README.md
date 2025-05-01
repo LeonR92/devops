@@ -44,7 +44,7 @@ graph TD
 
     subgraph "CI/CD Pipeline (Azure DevOps)"
         C -- 1. Lint & Test --> F[Ruff & Pytest];
-        F -- 2. Build --> G[Docker Image (for CI only)];
+        F -- 2. Build --> G[Docker Image for CI only];
         G -- 3. Push --> H(Azure Container Registry);
         H -- 4. Deploy --> I(Azure Function App);
         J[Variable Groups] -- Provides Config --> C;
