@@ -8,49 +8,58 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  pythonVersion: '3.10'
-  sourceDirectory: 'app'
+  - group: CIConfig 
 
 steps:
-- task: UsePythonVersion@0
+- task: Docker@2
+  displayName: 'Login to ACR $(acrLoginServer)'
   inputs:
-    versionSpec: '$(pythonVersion)'
-  displayName: 'Use Python $(pythonVersion)'
+    command: login
+    containerRegistry: '$(acrServiceConnection)'
 
 - script: |
-    python -m pip install --upgrade pip uv
-  displayName: 'Install uv'
-
-- script: |
-    uv sync --all-extras
-  displayName: 'Install dependencies using uv'
-
-- script: |
-    ruff check .
-  displayName: 'Run Ruff Linter'
+    docker run --rm \
+      -v $(System.DefaultWorkingDirectory):/app \
+      -w /app \
+      $(acrImageName) \
+      ruff check app tests
+  displayName: 'Run Ruff Linter (in container)'
   failOnStderr: true
 
 - script: |
-    ruff format --check .
-  displayName: 'Check Ruff Formatting'
+    docker run --rm \
+      -v $(System.DefaultWorkingDirectory):/app \
+      -w /app \
+      $(acrImageName) \
+      ruff format --check app tests
+  displayName: 'Check Ruff Formatting (in container)'
   failOnStderr: true
 
 - script: |
-    pytest \
-      --cov=$(sourceDirectory) \
-      --cov-report=term \
-      --cov-report=xml:coverage.xml \
-      --junitxml=TEST-results.xml \
-      --cov-fail-under=80 \
-      tests/
-  displayName: 'Run Pytest with Coverage (Fail < 80%)'
+    mkdir -p $(testResultsDirOnAgent)
+  displayName: 'Create test results directory on agent'
+
+- script: |
+    docker run --rm \
+      -v $(System.DefaultWorkingDirectory):/app \
+      -v $(testResultsDirOnAgent):$(testResultsDirInContainer) \
+      -w /app \
+      $(acrImageName) \
+      pytest \
+        --cov=app \
+        --cov-report=term \
+        --cov-report=xml:$(testResultsDirInContainer)/coverage.xml \
+        --junitxml=$(testResultsDirInContainer)/TEST-results.xml \
+        --cov-fail-under=80 \
+        tests/
+  displayName: 'Run Pytest with Coverage (in container, Fail < 80%)'
   failOnStderr: true
 
 - task: PublishTestResults@2
   condition: succeededOrFailed()
   inputs:
     testResultsFormat: 'JUnit'
-    testResultsFiles: '**/TEST-results.xml'
+    testResultsFiles: '$(testResultsDirOnAgent)/TEST-results.xml'
     searchFolder: '$(System.DefaultWorkingDirectory)'
     failTaskOnFailedTests: true
   displayName: 'Publish Test Results'
@@ -59,5 +68,12 @@ steps:
   condition: succeededOrFailed()
   inputs:
     codeCoverageTool: 'Cobertura'
-    summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage.xml'
+    summaryFileLocation: '$(testResultsDirOnAgent)/coverage.xml'
   displayName: 'Publish Code Coverage Results'
+
+- task: Docker@2
+  displayName: Logout from ACR
+  condition: always()
+  inputs:
+    command: logout
+    containerRegistry: '$(acrServiceConnection)'
