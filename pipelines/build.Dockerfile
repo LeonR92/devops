@@ -3,7 +3,7 @@
 FROM python:3.10-slim as builder
 WORKDIR /app
 RUN pip install --no-cache-dir --upgrade pip uv
-COPY pyproject.toml* ./
+COPY app/pyproject.toml* ./
 RUN uv sync --system --all-extras
 COPY ./app .
 
