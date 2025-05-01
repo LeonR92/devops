@@ -1,0 +1,63 @@
+trigger: none
+pr:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  pythonVersion: '3.10'
+  sourceDirectory: 'app'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '$(pythonVersion)'
+  displayName: 'Use Python $(pythonVersion)'
+
+- script: |
+    python -m pip install --upgrade pip uv
+  displayName: 'Install uv'
+
+- script: |
+    uv sync --all-extras
+  displayName: 'Install dependencies using uv'
+
+- script: |
+    ruff check .
+  displayName: 'Run Ruff Linter'
+  failOnStderr: true
+
+- script: |
+    ruff format --check .
+  displayName: 'Check Ruff Formatting'
+  failOnStderr: true
+
+- script: |
+    pytest \
+      --cov=$(sourceDirectory) \
+      --cov-report=term \
+      --cov-report=xml:coverage.xml \
+      --junitxml=TEST-results.xml \
+      --cov-fail-under=80 \
+      tests/
+  displayName: 'Run Pytest with Coverage (Fail < 80%)'
+  failOnStderr: true
+
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFormat: 'JUnit'
+    testResultsFiles: '**/TEST-results.xml'
+    searchFolder: '$(System.DefaultWorkingDirectory)'
+    failTaskOnFailedTests: true
+  displayName: 'Publish Test Results'
+
+- task: PublishCodeCoverageResults@1
+  condition: succeededOrFailed()
+  inputs:
+    codeCoverageTool: 'Cobertura'
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage.xml'
+  displayName: 'Publish Code Coverage Results'
