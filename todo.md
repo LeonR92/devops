@@ -83,12 +83,4 @@
     - Link Variable Groups to stages in the CD pipeline.
     - Integrate Variable Groups with the respective **Azure Key Vault** for each environment to pull secrets securely at runtime.
 
-**Why this is "Advanced" despite "Hello World":**
 
-- **End-to-End Automation:** Everything from PR checks to multi-stage Prod deployment with gates is automated.
-- **Infrastructure as Code:** Full environment provisioning and application configuration managed via Bicep and deployed via pipeline.
-- **Multi-Stage Release Management:** Sophisticated CD pipeline using ADO Environments, approvals, and automated gates.
-- **Integrated Security:** Branch policies, container scanning, dependency scanning, and Key Vault integration are built into the workflow.
-- **Monitoring Integration:** Pipelines interact with monitoring data (gates) and configure monitoring resources (App Insights, Alerts).
-- **Separation of Concerns:** Separate pipelines for CI, CD, and Infrastructure.
-- **Governance:** Strict branch policies and approval processes enforce quality and control.
